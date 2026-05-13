@@ -1,0 +1,5 @@
+shiny
+pandas
+duckdb
+pyarrow
+numpy
