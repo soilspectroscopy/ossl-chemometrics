@@ -115,7 +115,7 @@ data_overview_content = ui.div(
 data_selection_content = ui.div(
     # 1. Data Selection
     ui.div(
-        ui.div("1. Select dataset and load its contents", class_="section-title"),
+        ui.div("1. Select dataset and spectral region", class_="section-title"),
         ui.layout_columns(
             ui.div(
                 ui.input_select("dataset_code", "Dataset code", choices=dataset_codes, width="100%"),
@@ -124,7 +124,7 @@ data_selection_content = ui.div(
                 ui.output_ui("spectra_selector")
             ),
             ui.div(
-                ui.input_action_button("load_metadata", "Load contents", class_="btn-premium w-100 mt-4")
+                ui.input_action_button("load_metadata", "Load data", class_="btn-premium w-100 mt-4")
             ),
             col_widths=(4, 4, 4)
         ),
@@ -133,7 +133,7 @@ data_selection_content = ui.div(
 
     # 2. Lab Selection
     ui.div(
-        ui.div("2. Soil properties (mandatory)", class_="section-title"),
+        ui.div("2. Soil properties", class_="section-title"),
         ui.p("Select a soil property (or many). Rows with no valid values for the selected property (or combination of properties) will be automatically removed.", class_="text-muted small"),
         ui.output_ui("lab_column_selector"),
         ui.layout_columns(
@@ -155,7 +155,7 @@ data_selection_content = ui.div(
         ui.div("3. Site filtering (optional)", class_="section-title"),
         ui.layout_columns(
             ui.div(
-                ui.p("Select site columns to filter the dataset. Leave empty to keep all rows.", class_="text-muted small"),
+                ui.p("Select site columns to filter. Leave empty to keep all rows.", class_="text-muted small"),
                 ui.output_ui("site_column_selector"),
             ),
             ui.div(
@@ -164,16 +164,16 @@ data_selection_content = ui.div(
             ),
             col_widths=(6, 6)
         ),
-        ui.input_action_button("run_soil_site", "Recalculate summary statistics", class_="btn-premium w-25 mt-2"),
+        ui.input_action_button("run_soil_site", "Recalculate statistics", class_="btn-premium w-25 mt-2"),
         class_="premium-card"
     ),
 
-    # 4. Additional Spectra Metadata Filtering
+    # 4. Spectral Metadata Filtering
     ui.div(
-        ui.div("4. Additional metadata filtering (optional)", class_="section-title"),
+        ui.div("4. Spectral metadata filtering (when available)", class_="section-title"),
         ui.layout_columns(
             ui.div(
-                ui.p("Select columns to filter the dataset. Leave empty to keep all rows.", class_="text-muted small"),
+                ui.p("Select columns to filter. Leave empty to keep all rows.", class_="text-muted small"),
                 ui.output_ui("spec_column_selector"),
             ),
             ui.div(
@@ -190,7 +190,7 @@ data_selection_content = ui.div(
         ui.div("5. Join spectra & export", class_="section-title"),
         ui.layout_columns(
             ui.div(
-                ui.input_text("id_col", "Common ID Column", value="id.layer_local_c", width="100%"),
+                # ui.input_text("id_col", "Common ID Column", value="id.layer_local_c", width="100%"),
                 ui.input_select("spec_interval", "Spectral resolution", choices={"2": "Every 2 units", "10": "Every 10 units"}, selected="2", width="100%"),
                 ui.layout_columns(
                     ui.input_numeric("spec_min", "Min range", value=0),
@@ -1081,7 +1081,7 @@ def server(input, output, session):
         return ui.div(
             ui.input_selectize(
                 "export_cols", 
-                "Metadata/soil columns to keep", 
+                "Columns to export", 
                 choices=metadata_cols, 
                 selected=metadata_cols, 
                 multiple=True, 
