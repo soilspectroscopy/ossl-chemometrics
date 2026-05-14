@@ -15,7 +15,10 @@ import ssl
 # Environment setup
 # --------------------------------------------------------
 IS_WASM = sys.platform == "emscripten"
-ssl._create_default_https_context = ssl._create_unverified_context
+
+if not IS_WASM:
+    import ssl
+    ssl._create_default_https_context = ssl._create_unverified_context
 
 # --------------------------------------------------------
 # DuckDB connection (in-memory, per session)

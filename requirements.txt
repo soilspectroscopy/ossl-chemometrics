@@ -2,6 +2,6 @@ shiny
 pandas
 duckdb
 pyarrow
-numpy
-quarto
-Jinja2
+# numpy
+# quarto
+# Jinja2
