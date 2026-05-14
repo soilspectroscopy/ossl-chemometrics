@@ -1,0 +1,14 @@
+# Python virtual environment
+venv/
+.venv/
+env/
+
+# Shiny / Quarto build artifacts
+_site/
+
+# Python byte-code
+__pycache__/
+*.py[cod]
+
+# OS-specific files
+.DS_Store
