@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install shinylive shiny pandas duckdb pyarrow numpy
+          pip install shinylive shiny pandas duckdb pyarrow numpy Jinja2
 
       - name: Build Shinylive App
         run: shinylive export . _site

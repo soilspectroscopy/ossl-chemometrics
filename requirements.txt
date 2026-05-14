@@ -4,3 +4,4 @@ duckdb
 pyarrow
 numpy
 quarto
+Jinja2

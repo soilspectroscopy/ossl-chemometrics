@@ -9,11 +9,13 @@ import io
 import re
 import sys
 from pathlib import Path
+import ssl
 
 # --------------------------------------------------------
-# Environment detection
+# Environment setup
 # --------------------------------------------------------
 IS_WASM = sys.platform == "emscripten"
+ssl._create_default_https_context = ssl._create_unverified_context
 
 # --------------------------------------------------------
 # DuckDB connection (in-memory, per session)
@@ -88,8 +90,9 @@ except Exception as e:
 
 data_overview_content = ui.div(
     ui.div(
-        ui.p("The Open Soil Spectral Library (OSSL) is a global compilation of various spectral datasets and reference soil data."),
+        ui.p("The ", ui.tags.a("Open Soil Spectral Library (OSSL)", href="https://docs.soilspectroscopy.org/", target="_blank"), " is a global compilation of various spectral datasets and reference soil data."),
         ui.p("Standardized soil spectral libraries were created by reformatting to a common data structure and making them accessible via `csv.gz` and `parquet` files."),
+        ui.p("Please use this application to download data (", ui.tags.b("Prepare tab"), ") for your research or to prepare it for online chemometric analysis (", ui.tags.b("Chemometrics tab"), ")."),
         ui.p("The OSSL database schema is organized in three distinct tables:"),
         ui.tags.ul(
             ui.tags.li(ui.tags.b("Soilsite: "), "metadata of the sampling sites, locations (if available) and date of measurements (if available)."),
@@ -109,7 +112,7 @@ data_overview_content = ui.div(
 data_selection_content = ui.div(
     # 1. Data Selection
     ui.div(
-        ui.div("1. Select dataset and load metadata", class_="section-title"),
+        ui.div("1. Select dataset and load its contents", class_="section-title"),
         ui.layout_columns(
             ui.div(
                 ui.input_select("dataset_code", "Dataset code", choices=dataset_codes, width="100%"),
@@ -118,59 +121,60 @@ data_selection_content = ui.div(
                 ui.output_ui("spectra_selector")
             ),
             ui.div(
-                ui.input_action_button("load_metadata", "Load metadata", class_="btn-premium w-100 mt-4")
+                ui.input_action_button("load_metadata", "Load contents", class_="btn-premium w-100 mt-4")
             ),
             col_widths=(4, 4, 4)
         ),
         class_="premium-card"
     ),
 
-    # 2. Site Filtering
+    # 2. Lab Selection
     ui.div(
-        ui.div("2. Site filtering (Soilsite)", class_="section-title"),
+        ui.div("2. Soil properties (mandatory)", class_="section-title"),
+        ui.p("Select a soil property (or many). Rows with no valid values for the selected property (or combination of properties) will be automatically removed.", class_="text-muted small"),
+        ui.output_ui("lab_column_selector"),
         ui.layout_columns(
             ui.div(
-                ui.markdown("##### Select columns"),
-                ui.p("Select columns from Soilsite to filter the dataset.", class_="text-muted small"),
+                ui.input_radio_buttons("transform_type", "Apply transformation (optional)", choices={"none": "No transformation", "sqrt": "Square root (sqrt)", "log1p": "Log(1+x)"}, selected="none", inline=True),
+                ui.input_action_button("run_soil_only", "Preview", class_="btn-premium w-100 mb-2")
+            ),
+            ui.div(
+                ui.p("Summary statistics of selected properties"),
+                ui.output_table("summary_stats_table")
+            ),
+            col_widths=(3, 6)
+        ),
+        class_="premium-card"
+    ),
+
+    # 3. Site Filtering
+    ui.div(
+        ui.div("3. Site filtering (optional)", class_="section-title"),
+        ui.layout_columns(
+            ui.div(
+                ui.p("Select site columns to filter the dataset. Leave empty to keep all rows.", class_="text-muted small"),
                 ui.output_ui("site_column_selector"),
             ),
             ui.div(
-                ui.markdown("##### Filter values"),
-                ui.p("Highlight the unique or range of values to keep. Leave empty to keep all rows.", class_="text-muted small"),
-                ui.output_ui("site_level_filters"),
+                ui.p("Highlight the values to keep", class_="text-muted small"),
+                ui.output_ui("site_level_filters")
             ),
             col_widths=(6, 6)
         ),
+        ui.input_action_button("run_soil_site", "Recalculate summary statistics", class_="btn-premium w-25 mt-2"),
         class_="premium-card"
     ),
 
-    # 3. Lab Selection
+    # 4. Additional Spectra Metadata Filtering
     ui.div(
-        ui.div("3. Soil properties (Soillab)", class_="section-title"),
-        ui.markdown("##### Select columns"),
-        ui.p("Select a soil property to build a predictive model for. Rows with no valid values for the selected property will be automatically removed.", class_="text-muted small"),
-        ui.input_action_button("run_soil_only", "Preview data selection", class_="btn-premium w-25 mb-2"),
-        ui.input_radio_buttons("transform_type", "Apply transformation (optional)", choices={"none": "No transformation", "sqrt": "Square root (sqrt)", "log1p": "Log(1+x)"}, selected="none", inline=True),
-        ui.output_ui("lab_column_selector"),
-        ui.div(
-            ui.markdown("##### Summary statistics of selected properties"),
-            ui.output_table("summary_stats_table"),
-        ),
-        class_="premium-card"
-    ),
-
-    # 4. Spectra Metadata Filtering
-    ui.div(
-        ui.div("4. Spectra metadata filtering (when available)", class_="section-title"),
+        ui.div("4. Additional metadata filtering (optional)", class_="section-title"),
         ui.layout_columns(
             ui.div(
-                ui.markdown("##### Select columns"),
-                ui.p("Select additional spectra metadata to keep (e.g. specific instrument).", class_="text-muted small"),
+                ui.p("Select columns to filter the dataset. Leave empty to keep all rows.", class_="text-muted small"),
                 ui.output_ui("spec_column_selector"),
             ),
             ui.div(
-                ui.markdown("##### Filter values"),
-                ui.p("Highlight the unique values to keep. Leave empty to keep all rows.", class_="text-muted small"),
+                ui.p("Highlight the unique values to keep.", class_="text-muted small"),
                 ui.output_ui("spec_level_filters"),
             ),
             col_widths=(6, 6)
@@ -208,7 +212,7 @@ data_selection_content = ui.div(
 chemometrics_content = ui.div(
     ui.div(
         ui.h3("mdatools: make chemometrics easy"),
-        ui.p("Development and credits: ", ui.tags.a(" Sergey Kucheryavskiy", href="https://github.com/svkucheryavski", target="_blank"), "."),
+        ui.p("Development and credits: ", ui.tags.a("Sergey Kucheryavskiy", href="https://github.com/svkucheryavski", target="_blank"), "."),
         ui.p("Try most common chemometric methods directly in your browser. All calculations will run on your local computer without sending data or any other information anywhere."),
         ui.p("Check video tutorials at ", ui.tags.a("youtube.com/@mdatools", href="https://www.youtube.com/@mdatools", target="_blank"), ". For more information, please visit the ", ui.tags.a("mdatools website", href="https://mdatools.com", target="_blank"), "."),
         ui.hr(),
@@ -427,7 +431,7 @@ def server(input, output, session):
         df = joined_data()
         
         if df is None: 
-            return pd.DataFrame({"Info": ["Select a dataset and click 'Preview data selection' to see summary statistics."]})
+            return pd.DataFrame({"Info": ["Select a dataset, load, select a property (or many), and click 'Preview ' to see summary statistics."]})
         
         # 2. Identify the lab columns user wants to summarize
         # We include the transformation suffix if applicable
@@ -463,8 +467,10 @@ def server(input, output, session):
         stats['kurtosis'] = stats_df.kurtosis()
         
         display_cols = [
-            "count", "mean", "median", "std", 
-            "min", "max", "iqr", "skewness", "kurtosis"
+            "count",
+            "min", "mean", "std",
+            "median", "iqr", "max",
+            "skewness", "kurtosis"
         ]
         
         return (
@@ -555,16 +561,11 @@ def server(input, output, session):
                 spec_arrow.set(sp_table)
                 spec_url_rv.set(spec_url)
 
-                # Derive column lists for UI selectors
+                # 1. Get raw column names
                 s_cols = sorted(s_table.schema.names)
                 l_cols = sorted(l_table.schema.names)
-
                 sp_cols_raw = sp_table.schema.names
-                # sp_cols = [
-                #     c for c in sp_cols_raw
-                #     if not str(c).startswith("scan_")
-                #     and c not in {"id.layer_local_c", "id.scan_local_c", "id.layer_uuid_c"}
-                # ]
+                
                 scan_vals = []
                 for c in sp_cols_raw:
                         if str(c).startswith("scan_"):
@@ -573,13 +574,23 @@ def server(input, output, session):
                             num_str = re.sub(r'_(abs|ref|bc\.abs)$', '', num_str)
                             try: scan_vals.append(float(num_str))
                             except: pass
+                
                 if scan_vals:
                     ui.update_numeric("spec_min", value=min(scan_vals))
                     ui.update_numeric("spec_max", value=max(scan_vals))
 
+                # 3. FILTER the spectra metadata columns
+                # We remove anything starting with 'scan_' AND the join IDs
+                clean_spec_metadata = [
+                    c for c in sp_cols_raw
+                    if not str(c).startswith("scan_")
+                    and c not in {"id.layer_local_c", "id.scan_local_c", "id.layer_uuid_c", "id.layer_uuid"}
+                ]
+
                 site_cols_rv.set(s_cols)
                 lab_cols_rv.set(l_cols)
-                spec_cols_rv.set(sorted(sp_cols_raw))
+                # spec_cols_rv.set(sorted(sp_cols_raw))
+                spec_cols_rv.set(sorted(clean_spec_metadata))
 
                 # # Reset previously derived reactive values
                 # unique_site_levels.set({})
@@ -606,7 +617,7 @@ def server(input, output, session):
     def lab_column_selector():
         cols = lab_cols_rv()
         if not cols:
-            return ui.p("Load metadata first.", class_="text-muted")
+            return ui.p("Load dataset contents first.", class_="text-muted")
 
         # Select first column by default
         defaults = cols[:1]
@@ -637,7 +648,7 @@ def server(input, output, session):
 
         levels = {}
         # Only fetch levels for columns that need a dropdown
-        cat_cols = [c for c in selected if c.endswith(("_c", "_txt"))]
+        cat_cols = [c for c in selected if c.endswith(("_c", "_txt", "_uint16", "_id", "_logical"))]
         
         if cat_cols:
             with ui.Progress(min=1, max=len(cat_cols)) as p:
@@ -663,25 +674,25 @@ def server(input, output, session):
 
         filters = []
         for col in selected:
-            # Categorical logic (_c or _txt)
-            if col.endswith(("_c", "_txt")):
+            # Categorical logic
+            if col.endswith(("_c", "_txt", "_uint16", "_id", "_logical")):
                 if col in levels_dict and levels_dict[col]:
                     safe_id = "site_filter_" + re.sub(r'\W+', '_', col)
                     filters.append(
-                        ui.input_selectize(safe_id, f"Filter: {col} (categorical)", 
+                        ui.input_selectize(safe_id, f"Filter: {col}", 
                                         choices=levels_dict[col], multiple=True, width="100%")
                     )
             
-            # Numeric range logic (_cm or _dd)
+            # Numeric range logic
             elif col.endswith(("_cm", "_dd")):
                 safe_id_min = "site_filter_min_" + re.sub(r'\W+', '_', col)
                 safe_id_max = "site_filter_max_" + re.sub(r'\W+', '_', col)
                 filters.append(
                     ui.div(
-                        ui.markdown(f"Range: {col} (numeric)"),
+                        ui.markdown(f"Range: {col}"),
                         ui.layout_columns(
-                            ui.input_numeric(safe_id_min, "Min", value=float("-inf")),
-                            ui.input_numeric(safe_id_max, "Max", value=float("inf")),
+                            ui.input_numeric(safe_id_min, "Min", value=None),
+                            ui.input_numeric(safe_id_max, "Max", value=None),
                             col_widths=(6, 6)
                         ),
                         class_="mb-3 border-bottom pb-2"
@@ -689,7 +700,7 @@ def server(input, output, session):
                 )
 
         if not filters:
-            return ui.p("Select columns ending in _c, _txt, _cm, or _dd to filter.", class_="text-muted")
+            return ui.p("Select other columns to filter.", class_="text-muted")
 
         return ui.div(*filters)
 
@@ -749,7 +760,7 @@ def server(input, output, session):
             safe_suffix = re.sub(r'\W+', '_', col)
             
             # Logic for categorical columns
-            if col.endswith(("_c", "_txt")):
+            if col.endswith(("_c", "_txt", "_uint16", "_id", "_logical")):
                 safe_id = "site_filter_" + safe_suffix
                 try:
                     selected_levels = input[safe_id]()
@@ -765,11 +776,15 @@ def server(input, output, session):
                     l_min = input["site_filter_min_" + safe_suffix]()
                     l_max = input["site_filter_max_" + safe_suffix]()
                     
-                    # Only add to query if values are not default infinity
-                    if l_min != float("-inf"):
+                    # Validate that at least one bound is set (not default)
+                    has_min = l_min is not None and l_min != float("-inf")
+                    has_max = l_max is not None and l_max != float("inf")
+                    
+                    if has_min:
                         site_filters.append(f'"{col}"::DOUBLE >= {l_min}')
-                    if l_max != float("inf"):
+                    if has_max:
                         site_filters.append(f'"{col}"::DOUBLE <= {l_max}')
+                        
                 except:
                     pass
                     
@@ -807,9 +822,61 @@ def server(input, output, session):
     # --------------------------------------------------
     # Soil-only preview (no spectra join)
     # --------------------------------------------------
+    def _validate_filters():
+        """
+        Validate that all selected filter columns have values set.
+        Returns (is_valid, error_message)
+        """
+        site_selected = list(input.site_cols() or [])
+        
+        # Check numeric site filters
+        for col in site_selected:
+            if col.endswith(("_cm", "_dd")):
+                safe_suffix = re.sub(r'\W+', '_', col)
+                try:
+                    l_min = input["site_filter_min_" + safe_suffix]()
+                    l_max = input["site_filter_max_" + safe_suffix]()
+                    
+                    has_min = l_min is not None and l_min != float("-inf")
+                    has_max = l_max is not None and l_max != float("inf")
+                    
+                    if not has_min and not has_max:
+                        return False, f"Please provide at least one value (min or max) for '{col}', or deselect it."
+                except:
+                    return False, f"Could not read filter values for '{col}'"
+        
+        # Check categorical site filters (if they have levels but nothing selected, warn)
+        levels_dict = unique_site_levels()
+        for col in site_selected:
+            if col.endswith(("_c", "_txt", "_uint16", "_id", "_logical")):
+                if col in levels_dict and levels_dict[col]:  # Has available levels
+                    safe_id = "site_filter_" + re.sub(r'\W+', '_', col)
+                    try:
+                        selected_levels = input[safe_id]()
+                        if not selected_levels:  # Nothing selected
+                            # This is OK — it means keep all levels (no filter)
+                            pass
+                    except:
+                        pass
+        
+        return True, ""
+
     @reactive.Effect
-    @reactive.event(input.run_soil_only)
+    @reactive.event(input.run_soil_only, input.run_soil_site)
     def _run_soil_only():
+        
+        lab_selected = list(input.lab_cols() or [])
+        
+        if not lab_selected:
+            ui.notification_show("Mandatory: Please select at least one soil property.", type="error")
+            return
+        
+        # Validate filters before processing
+        is_valid, error_msg = _validate_filters()
+        if not is_valid:
+            ui.notification_show(error_msg, type="error", duration=10)
+            return
+
         if site_arrow() is None or lab_arrow() is None:
             ui.notification_show("Ensure metadata is loaded.", type="warning")
             return
@@ -851,6 +918,12 @@ def server(input, output, session):
     @reactive.event(input.run_join)
     def _run_join():
         try:
+            # Validate filters first
+            is_valid, error_msg = _validate_filters()
+            if not is_valid:
+                ui.notification_show(error_msg, type="error", duration=10)
+                return
+            
             if site_arrow() is None or lab_arrow() is None or spec_arrow() is None:
                 ui.notification_show("Ensure metadata is loaded.", type="warning")
                 return
