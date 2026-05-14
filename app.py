@@ -190,14 +190,14 @@ data_selection_content = ui.div(
         ui.div("5. Join spectra & export", class_="section-title"),
         ui.layout_columns(
             ui.div(
-                # ui.input_text("id_col", "Common ID Column", value="id.layer_local_c", width="100%"),
+                ui.input_text("id_col", "Common ID Column", value="id.layer_local_c", width="100%"),
                 ui.input_select("spec_interval", "Spectral resolution", choices={"2": "Every 2 units", "10": "Every 10 units"}, selected="2", width="100%"),
                 ui.layout_columns(
                     ui.input_numeric("spec_min", "Min range", value=0),
                     ui.input_numeric("spec_max", "Max range", value=10000),
                     col_widths=(6, 6)
                 ),
-                ui.input_select("join_type", "Join type", choices={"inner": "Only sites with spectra", "full": "Keep all sites, add spectra where available", "left": "Keep all spectra, add soil where available"}, selected="inner", width="100%"),
+                ui.input_select("join_type", "Join type", choices={"inner": "Only data with spectra", "full": "Keep all data, add spectra where available"}, selected="inner", width="100%"),
                 ui.input_action_button("run_join", "Join with available spectra", class_="btn-premium w-100 mb-3"),
                 ui.output_ui("export_column_selector"),
                 ui.input_text("dl_filename", "Filename to save", value="ossl_filtered_data.csv", width="100%"),
