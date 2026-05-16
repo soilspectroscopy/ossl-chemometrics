@@ -385,12 +385,12 @@ data_selection_content = ui.div(
                               value="id.layer_local_c", width="100%"),
                 ui.input_select(
                     "spec_interval", "Spectral resolution",
-                    choices={"2": "Every 2 units", "10": "Every 10 units"},
+                    choices={"2": "Every 2 units (nm or cm⁻¹)", "10": "Every 10 units (nm or cm⁻¹)"},
                     selected="2", width="100%",
                 ),
                 ui.layout_columns(
-                    ui.input_numeric("spec_min", "Min range", value=0),
-                    ui.input_numeric("spec_max", "Max range", value=10000),
+                    ui.input_numeric("spec_min", "Min (nm or cm⁻¹)", value=0),
+                    ui.input_numeric("spec_max", "Max (nm or cm⁻¹)", value=10000),
                     col_widths=(6, 6),
                 ),
                 ui.input_select(
@@ -489,9 +489,9 @@ formatting_content = ui.div(
                     selected="2", width="100%",
                 ),
                 ui.layout_columns(
-                    ui.input_numeric("fmt_min", "Min wavelength/wavenumber",
+                    ui.input_numeric("fmt_min", "Min (nm or cm⁻¹)",
                                      value=None),
-                    ui.input_numeric("fmt_max", "Max wavelength/wavenumber",
+                    ui.input_numeric("fmt_max", "Max (nm or cm⁻¹)",
                                      value=None),
                     col_widths=(6, 6),
                 ),
@@ -588,6 +588,8 @@ about_content = ui.div(
         ui.p("Originally funded by the USDA National Institute of Food and "
              "Agriculture Award #2020-67021-32467."),
         ui.p("Currently maintained by Fund for Climate Solutions from Woodwell Climate."),
+        ui.p("For questions, suggestions, bug reports, and inquiries:   "),
+        ui.p(ui.a("soilspec4gg@woodwellclimate.org", href="mailto:soilspec4gg@woodwellclimate.org", target="_blank")),
         ui.hr(),
         ui.markdown("""
 ### Credits & data sources
@@ -696,28 +698,28 @@ app_ui = ui.page_fluid(
     ui.div(
         ui.div(
             ui.div(
-                ui.span("①", class_="step-num"),
+                ui.span("1", class_="step-num"),
                 ui.span("Overview", class_="step-label"),
                 ui.span("listed libraries", style="color:#718096"),
                 class_="workflow-step",
             ),
             ui.span("→", class_="workflow-arrow"),
             ui.div(
-                ui.span("②", class_="step-num"),
+                ui.span("2", class_="step-num"),
                 ui.span("Prepare", class_="step-label"),
                 ui.span("filter, join & export your extract", style="color:#718096"),
                 class_="workflow-step",
             ),
             ui.span("→", class_="workflow-arrow"),
             ui.div(
-                ui.span("③", class_="step-num"),
+                ui.span("3", class_="step-num"),
                 ui.span("My Data", class_="step-label"),
                 ui.span("resample your own spectra (optional)", style="color:#718096"),
                 class_="workflow-step",
             ),
             ui.span("→", class_="workflow-arrow"),
             ui.div(
-                ui.span("④", class_="step-num"),
+                ui.span("4", class_="step-num"),
                 ui.span("Analyse", class_="step-label"),
                 ui.span("open mdatools in a new tab", style="color:#718096"),
                 class_="workflow-step",
