@@ -238,39 +238,25 @@ def _premium_card(*children, title: str | None = None):
 # --------------------------------------------------------
 data_overview_content = ui.div(
     _premium_card(
-        ui.p(
-            "The ",
-            ui.tags.a("Open Soil Spectral Library (OSSL)",
-                      href="https://docs.soilspectroscopy.org/", target="_blank"),
-            " is a global compilation of soil spectral datasets paired with "
-            "reference laboratory measurements, assembled from contributions "
-            "worldwide and made freely available for research and modelling.",
+        ui.p("The ", ui.tags.a("Open Soil Spectral Library (OSSL)",
+             href="https://docs.soilspectroscopy.org/", target="_blank"),
+             " is a global compilation of various spectral datasets and reference soil data."),
+        ui.p("Standardized soil spectral libraries were created by reformatting to a common "
+             "data structure and making them accessible via csv.gz and parquet files."),
+        ui.p("Please use this application to download data (",
+             ui.tags.b("Prepare tab"), ") for your research or to prepare it for online "
+             "chemometric analysis (", ui.tags.b("Chemometrics tab"), ")."),
+        ui.p("The OSSL database schema is organized in three distinct tables:"),
+        ui.tags.ul(
+            ui.tags.li(ui.tags.b("Soilsite: "),
+                       "metadata of the sampling sites, locations (if available) "
+                       "and date of measurements (if available)."),
+            ui.tags.li(ui.tags.b("Soillab: "), "measured soil properties."),
+            ui.tags.li(ui.tags.b("Spectra (nir, visnir, mir): "),
+                       "raw spectral data formatted to evenly spaced intervals, "
+                       "across different spectral ranges."),
         ),
-        ui.p(
-            "All datasets share a common structure with three linked tables: ",
-            ui.tags.b("Soilsite"), " (sampling location and date), ",
-            ui.tags.b("Soillab"), " (measured soil properties), and ",
-            ui.tags.b("Spectra"), " (raw absorbance or reflectance values across "
-            "NIR, VisNIR, or MIR ranges at evenly spaced intervals).",
-        ),
-        ui.p(
-            "Use the tabs above to work through the workflow: browse the available "
-            "datasets here, then go to ",
-            ui.tags.b("Prepare"), " to filter, join, and export a dataset tailored "
-            "to your needs. If you have your own spectra, use ",
-            ui.tags.b("My Data"), " to resample them to a standard interval. "
-            "Finally, open ",
-            ui.tags.b("Analyse"), " to launch one of the mdatools chemometric apps "
-            "directly in your browser.",
-        ),
-        ui.p(
-            "For full details on each dataset, including collection protocols and "
-            "license information, see the ",
-            ui.tags.a("'Soil spectral libraries' section",
-                      href="https://docs.soilspectroscopy.org/libraries.html",
-                      target="_blank"),
-            " of the OSSL Manual.",
-        ),
+        ui.p("A list of currently available datasets is provided below."),
     ),
     _premium_card(
         ui.output_data_frame("datasets_overview_table"),
@@ -324,57 +310,41 @@ data_selection_content = ui.div(
         title="2. Soil properties",
     ),
 
-    # 3 & 4. Advanced filtering — collapsible
-    ui.div(
-        ui.tags.details(
-            ui.tags.summary(
-                ui.span("3 & 4. Advanced filtering (optional) — site & spectral metadata",
-                        style="font-size:1rem;font-weight:600;color:#4a5568;cursor:pointer;"),
-                style="list-style:none;display:flex;align-items:center;gap:8px;"
-                      "padding:14px 20px;border-radius:12px;"
-                      "background:white;border:1px solid #e9ecef;"
-                      "box-shadow:0 4px 6px rgba(0,0,0,0.05);",
-            ),
-            # 3. Site filtering
+    # 3. Site filtering
+    _premium_card(
+        ui.layout_columns(
             ui.div(
-                _premium_card(
-                    ui.layout_columns(
-                        ui.div(
-                            ui.p("Select site columns to filter. Leave empty to keep all rows.",
-                                 class_="text-muted small"),
-                            ui.output_ui("site_column_selector"),
-                        ),
-                        ui.div(
-                            ui.p("Highlight the values to keep", class_="text-muted small"),
-                            ui.output_ui("site_level_filters"),
-                        ),
-                        col_widths=(6, 6),
-                    ),
-                    ui.input_action_button("run_soil_site", "Recalculate statistics",
-                                           class_="btn-premium w-25 mt-2"),
-                    title="3. Site filtering",
-                ),
-                # 4. Spectral metadata filtering
-                _premium_card(
-                    ui.layout_columns(
-                        ui.div(
-                            ui.p("Select columns to filter. Leave empty to keep all rows.",
-                                 class_="text-muted small"),
-                            ui.output_ui("spec_column_selector"),
-                        ),
-                        ui.div(
-                            ui.p("Highlight the unique values to keep.",
-                                 class_="text-muted small"),
-                            ui.output_ui("spec_level_filters"),
-                        ),
-                        col_widths=(6, 6),
-                    ),
-                    title="4. Spectral metadata filtering (when available)",
-                ),
-                style="margin-top:8px;",
+                ui.p("Select site columns to filter. Leave empty to keep all rows.",
+                     class_="text-muted small"),
+                ui.output_ui("site_column_selector"),
             ),
+            ui.div(
+                ui.p("Highlight the values to keep", class_="text-muted small"),
+                ui.output_ui("site_level_filters"),
+            ),
+            col_widths=(6, 6),
         ),
-        style="margin-bottom:20px;",
+        ui.input_action_button("run_soil_site", "Recalculate statistics",
+                               class_="btn-premium w-25 mt-2"),
+        title="3. Site filtering (optional)",
+    ),
+
+    # 4. Spectral metadata filtering
+    _premium_card(
+        ui.layout_columns(
+            ui.div(
+                ui.p("Select columns to filter. Leave empty to keep all rows.",
+                     class_="text-muted small"),
+                ui.output_ui("spec_column_selector"),
+            ),
+            ui.div(
+                ui.p("Highlight the unique values to keep.",
+                     class_="text-muted small"),
+                ui.output_ui("spec_level_filters"),
+            ),
+            col_widths=(6, 6),
+        ),
+        title="4. Spectral metadata filtering (when available)",
     ),
 
     # 5. Join & Export
@@ -408,9 +378,8 @@ data_selection_content = ui.div(
                                    class_="btn-success-premium w-100"),
             ),
             ui.div(
-                ui.output_ui("spectrum_preview"),   # inline SVG — above the table
-                ui.div(style="height:14px;"),        # breathing room
                 ui.output_data_frame("preview_table"),
+                ui.output_ui("spectrum_preview"),   # inline SVG spectrum plot
             ),
             col_widths=(3, 9),
         ),
@@ -434,7 +403,7 @@ _SAMPLE_FILES = {
         "https://raw.githubusercontent.com/soilspectroscopy/ossl-models"
         "/main/sample-data/sample_mir_data.csv"
     ),
-    "sample_neospectra_data.csv": (
+    "sample_nir_data.csv": (
         "https://raw.githubusercontent.com/soilspectroscopy/ossl-models"
         "/main/sample-data/sample_neospectra_data.csv"
     ),
@@ -468,11 +437,11 @@ formatting_content = ui.div(
              class_="mb-1 mt-3 fw-semibold"),
         ui.div(
             ui.download_button("dl_sample_visnir",    "sample_visnir_data.csv",
-                               class_="btn btn-sample me-2 mb-1"),
+                               class_="btn btn-sm btn-outline-secondary me-2 mb-1"),
             ui.download_button("dl_sample_mir",       "sample_mir_data.csv",
-                               class_="btn btn-sample me-2 mb-1"),
-            ui.download_button("dl_sample_neospectra","sample_neospectra_data.csv",
-                               class_="btn btn-sample me-2 mb-1"),
+                               class_="btn btn-sm btn-outline-secondary me-2 mb-1"),
+            ui.download_button("dl_sample_nir","sample_nir_data.csv",
+                               class_="btn btn-sm btn-outline-secondary me-2 mb-1"),
         ),
         title="Resample your own spectral data",
     ),
@@ -643,44 +612,6 @@ app_ui = ui.page_fluid(
             border: 2px dashed #667eea; border-radius: 12px;
             padding: 20px; margin-bottom: 20px; background: #f5f4ff;
         }
-        /* Workflow banner */
-        .workflow-banner {
-            background: linear-gradient(135deg, #f0f4ff 0%, #f5f0ff 100%);
-            border: 1px solid #d6d0f5; border-radius: 12px;
-            padding: 14px 24px; margin-bottom: 18px;
-            display: flex; align-items: center; justify-content: center;
-            flex-wrap: wrap; gap: 0; font-size: 0.88rem; color: #4a5568;
-        }
-        .workflow-step {
-            display: flex; align-items: center; gap: 6px;
-        }
-        .workflow-step .step-num {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white; border-radius: 50%; width: 22px; height: 22px;
-            display: inline-flex; align-items: center; justify-content: center;
-            font-size: 0.75rem; font-weight: 700; flex-shrink: 0;
-        }
-        .workflow-step .step-label { font-weight: 600; color: #2c3e50; }
-        .workflow-arrow {
-            margin: 0 10px; color: #a0aec0; font-size: 1rem;
-        }
-        /* Advanced filtering disclosure */
-        .adv-filter-toggle {
-            background: none; border: none; color: #667eea; font-size: 0.88rem;
-            font-weight: 600; cursor: pointer; padding: 4px 0;
-            display: flex; align-items: center; gap: 4px;
-        }
-        .adv-filter-toggle:hover { color: #764ba2; }
-        /* Sample download buttons — teal outline */
-        .btn-sample {
-            border: 1.5px solid #1d9e75 !important; color: #0f6e56 !important;
-            background: white !important; border-radius: 8px !important;
-            font-size: 12px; font-weight: 600; padding: 5px 12px;
-            transition: background 0.15s;
-        }
-        .btn-sample:hover {
-            background: #e1f5ee !important; color: #085041 !important;
-        }
     """)),
 
     ui.div(
@@ -693,46 +624,12 @@ app_ui = ui.page_fluid(
         class_="text-center mb-4 mt-3",
     ),
 
-    ui.div(
-        ui.div(
-            ui.div(
-                ui.span("①", class_="step-num"),
-                ui.span("Overview", class_="step-label"),
-                ui.span("listed libraries", style="color:#718096"),
-                class_="workflow-step",
-            ),
-            ui.span("→", class_="workflow-arrow"),
-            ui.div(
-                ui.span("②", class_="step-num"),
-                ui.span("Prepare", class_="step-label"),
-                ui.span("filter, join & export your extract", style="color:#718096"),
-                class_="workflow-step",
-            ),
-            ui.span("→", class_="workflow-arrow"),
-            ui.div(
-                ui.span("③", class_="step-num"),
-                ui.span("My Data", class_="step-label"),
-                ui.span("resample your own spectra (optional)", style="color:#718096"),
-                class_="workflow-step",
-            ),
-            ui.span("→", class_="workflow-arrow"),
-            ui.div(
-                ui.span("④", class_="step-num"),
-                ui.span("Analyse", class_="step-label"),
-                ui.span("open mdatools in a new tab", style="color:#718096"),
-                class_="workflow-step",
-            ),
-            class_="workflow-banner",
-        ),
-        style="padding: 0 0 4px 0;",
-    ),
-
     ui.navset_tab(
-        ui.nav_panel("Overview",  data_overview_content),
-        ui.nav_panel("Prepare",   data_selection_content),
-        ui.nav_panel("My Data",   formatting_content),
-        ui.nav_panel("Analyse",   chemometrics_content),
-        ui.nav_panel("About",     about_content),
+        ui.nav_panel("Explore",      data_overview_content),
+        ui.nav_panel("Prepare",      data_selection_content),
+        ui.nav_panel("Formatting",   formatting_content),
+        ui.nav_panel("Chemometrics", chemometrics_content),
+        ui.nav_panel("About",        about_content),
     ),
 
     ui.div(
@@ -740,17 +637,7 @@ app_ui = ui.page_fluid(
         ui.p("© 2026 Soil Spectroscopy for Global Good. Distributed under MIT License."),
         ui.p("Data provided by the OSSL may be subject to individual dataset licenses. "
              "Please cite the original authors."),
-        ui.p(
-            ui.a("OSSL Manual", href="https://docs.soilspectroscopy.org/",
-                 target="_blank", style="color:#667eea;margin-right:16px;"),
-            ui.a("GitHub", href="https://github.com/soilspectroscopy",
-                 target="_blank", style="color:#667eea;margin-right:16px;"),
-            ui.a("mdatools", href="https://mdatools.com",
-                 target="_blank", style="color:#667eea;"),
-            style="margin-top:4px;font-size:0.88rem;",
-        ),
         class_="footer",
-        style="text-align:center;padding:16px 0 24px;color:#718096;font-size:0.85rem;",
     ),
 )
 
@@ -1558,12 +1445,12 @@ def server(input, output, session):
             return
         yield raw.decode("utf-8", errors="replace")
 
-    @render.download(filename="sample_neospectra_data.csv")
-    def dl_sample_neospectra():
+    @render.download(filename="sample_nir_data.csv")
+    def dl_sample_nir():
         try:
-            raw = _http_get(_SAMPLE_FILES["sample_neospectra_data.csv"])
+            raw = _http_get(_SAMPLE_FILES["sample_nir_data.csv"])
         except Exception as e:
-            yield f"# Error fetching sample_neospectra_data.csv: {e}\n"
+            yield f"# Error fetching sample_nir_data.csv: {e}\n"
             return
         yield raw.decode("utf-8", errors="replace")
 
