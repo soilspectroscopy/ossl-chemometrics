@@ -835,6 +835,20 @@ def server(input, output, session):
         # only on first click, after the UI is already interactive.
         import duckdb  # pyrefly: ignore [missing-import]
 
+        # ---- Reset all filters / results from any previous dataset --------
+        site_cols_rv.set([])
+        lab_cols_rv.set([])
+        spec_cols_rv.set([])
+        unique_site_levels.set({})
+        unique_spec_levels.set({})
+        joined_data.set(None)
+        
+        # # Clear the multi-select inputs so stale values don't linger in the UI
+        # ui.update_selectize("site_cols", choices=[], selected=[])
+        # ui.update_selectize("lab_cols",  choices=[], selected=[])
+        # ui.update_selectize("spec_cols", choices=[], selected=[])
+        # -------------------------------------------------------------------
+
         d_code = input.dataset_code()
         s_type = input.spectra_type()
 
@@ -1073,8 +1087,11 @@ def server(input, output, session):
 
     # ---- SQL query builders --------------------------------------------
     def _build_site_where(site_selected):
+        valid = set(site_cols_rv())          # only columns from the current dataset
         site_filters = []
         for col in site_selected:
+            if col not in valid:             # skip stale selections
+                continue
             suffix = re.sub(r"\W+", "_", col)
             if col.endswith(("_c","_txt","_uint16","_id","_logical","_code")):
                 try:
@@ -1117,8 +1134,11 @@ def server(input, output, session):
         return ", ".join(cols)
 
     def _build_spec_where(spec_selected):
+        valid = set(spec_cols_rv())          # only columns from the current dataset
         filters = []
         for col in spec_selected:
+            if col not in valid:             # skip stale selections
+                continue
             safe_id = "spec_filter_" + re.sub(r"\W+", "_", col)
             try:
                 lvls = input[safe_id]()
@@ -1232,7 +1252,9 @@ def server(input, output, session):
 
         site_selected = _safe("site_cols")
         lab_selected  = _safe("lab_cols")
+        lab_selected  = [c for c in lab_selected if c in lab_cols_rv()] 
         spec_selected = _safe("spec_cols")
+        spec_selected = [c for c in spec_selected if c in spec_cols_rv()]
         j_type    = input.join_type()
         transform = input.transform_type()
         interval  = int(input.spec_interval())
