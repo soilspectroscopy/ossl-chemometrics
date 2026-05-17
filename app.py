@@ -977,7 +977,7 @@ def server(input, output, session):
             return
         levels = {}
         cat_cols = [c for c in selected
-                    if c.endswith(("_c","_txt","_uint16","_id","_logical"))]
+                    if c.endswith(("_c","_txt","_uint16","_id","_logical","_code"))]
         if cat_cols:
             with ui.Progress(min=1, max=len(cat_cols)) as p:
                 p.set(message="Extracting site levels…")
@@ -1000,7 +1000,7 @@ def server(input, output, session):
             return ui.p("Select site columns to see filters.", class_="text-muted")
         filters = []
         for col in selected:
-            if col.endswith(("_c","_txt","_uint16","_id","_logical")):
+            if col.endswith(("_c","_txt","_uint16","_id","_logical","_code")):
                 if col in levels_dict and levels_dict[col]:
                     safe_id = "site_filter_" + re.sub(r"\W+", "_", col)
                     filters.append(
@@ -1008,7 +1008,7 @@ def server(input, output, session):
                                            choices=levels_dict[col],
                                            multiple=True, width="100%")
                     )
-            elif col.endswith(("_cm","_dd")):
+            elif col.endswith(("_cm","_dd","_m")):
                 safe_id_min = "site_filter_min_" + re.sub(r"\W+", "_", col)
                 safe_id_max = "site_filter_max_" + re.sub(r"\W+", "_", col)
                 filters.append(
@@ -1076,14 +1076,14 @@ def server(input, output, session):
         site_filters = []
         for col in site_selected:
             suffix = re.sub(r"\W+", "_", col)
-            if col.endswith(("_c","_txt","_uint16","_id","_logical")):
+            if col.endswith(("_c","_txt","_uint16","_id","_logical","_code")):
                 try:
                     lvls = input["site_filter_" + suffix]()
                     if lvls:
                         fmtd = ", ".join(f"'{x}'" for x in lvls)
                         site_filters.append(f'"{col}"::VARCHAR IN ({fmtd})')
                 except: pass
-            elif col.endswith(("_cm","_dd")):
+            elif col.endswith(("_cm","_dd","_m")):
                 try:
                     lo = input["site_filter_min_" + suffix]()
                     hi = input["site_filter_max_" + suffix]()
@@ -1131,7 +1131,7 @@ def server(input, output, session):
     def _validate_filters():
         site_selected = list(input.site_cols() or [])
         for col in site_selected:
-            if col.endswith(("_cm","_dd")):
+            if col.endswith(("_cm","_dd","_m")):
                 suffix = re.sub(r"\W+", "_", col)
                 try:
                     lo = input["site_filter_min_" + suffix]()
@@ -1434,7 +1434,7 @@ def server(input, output, session):
         group_choices = {"": "— none —"}
         # Only offer categorical site cols as stratification options
         for c in site_selected:
-            if c.endswith(("_c","_txt","_uint16","_id","_logical")):
+            if c.endswith(("_c","_txt","_uint16","_id","_logical","_code")):
                 group_choices[c] = c
 
         return ui.div(

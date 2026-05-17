@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-15T23:42:26+00:00",
+  "generated_at": "2026-05-17T03:44:50+00:00",
   "datasets": {
     "AFSIS1": {
       "spectra_types": [
@@ -239,8 +239,8 @@
             "layer.lower.depth_usda_cm",
             "layer.sequence_usda_uint16",
             "layer.upper.depth_usda_cm",
-            "loc.country.code_src_txt",
-            "loc.country.name_src_txt",
+            "loc.country_src_code",
+            "loc.country_src_txt",
             "loc.province_src_txt",
             "loc.subdiv.name_src_txt",
             "loc.subdiv.type_src_txt",
@@ -369,7 +369,6 @@
         "soilsite": {
           "url": "https://storage.googleapis.com/soilspec4gg-public/datasets/Geocradle/ossl_soilsite_v1.3.parquet",
           "columns": [
-            "Sampling_date2",
             "dataset.code_ascii_txt",
             "id.layer_local_c",
             "id.layer_uuid_txt",
@@ -458,7 +457,6 @@
         "soilsite": {
           "url": "https://storage.googleapis.com/soilspec4gg-public/datasets/HSDOS/ossl_soilsite_v1.3.parquet",
           "columns": [
-            "PROFILE_LEVEL",
             "dataset.code_ascii_txt",
             "id.layer_local_c",
             "id.layer_uuid_txt",
@@ -610,7 +608,9 @@
             "longitude.point_wgs84_dd",
             "observation.date.begin_iso.8601_yyyy.mm.dd",
             "observation.date.end_iso.8601_yyyy.mm.dd",
-            "site.landuse_src_txt"
+            "site.landuse2009_src_code",
+            "site.landuse2012_src_code",
+            "site.landuse2015_src_code"
           ]
         },
         "soillab": {
@@ -690,6 +690,107 @@
           "scan_min": 1100.0,
           "scan_max": 2498.0,
           "scan_count": 700,
+          "meta_columns": []
+        }
+      }
+    },
+    "NEON": {
+      "spectra_types": [
+        "mir"
+      ],
+      "files": {
+        "soilsite": {
+          "url": "https://storage.googleapis.com/soilspec4gg-public/datasets/NEON/ossl_soilsite_v1.3.parquet",
+          "columns": [
+            "dataset.code_ascii_txt",
+            "id.biogeo_src_txt",
+            "id.layer_local_c",
+            "id.layer_uuid_txt",
+            "layer.lower.depth_usda_cm",
+            "layer.upper.depth_usda_cm",
+            "observation.date_src_yyyy.mm.dd",
+            "pedon.horizon_src_tst",
+            "site.domain_src_txt",
+            "site.id_src_txt",
+            "site.pit.name_src_txt",
+            "site.pit_src_txt"
+          ]
+        },
+        "soillab": {
+          "url": "https://storage.googleapis.com/soilspec4gg-public/datasets/NEON/ossl_soillab_v1.3.parquet",
+          "columns": [
+            "al.ext_usda.a69_cmolc.kg",
+            "bd_usda.a4_g.cm3",
+            "c.tot_usda.a622_w.pct",
+            "ca.ext_usda.a722_cmolc.kg",
+            "caco3_usda.a54_w.pct",
+            "cec_usda.a723_cmolc.kg",
+            "cf_usda.c232_w.pct",
+            "cf_usda.c235_w.pct",
+            "clay.tot_usda.a334_w.pct",
+            "ec_usda.a364_ds.m",
+            "id.layer_local_c",
+            "k.ext_usda.a725_cmolc.kg",
+            "mg.ext_usda.a724_cmolc.kg",
+            "n.tot_usda.a623_w.pct",
+            "na.ext_usda.a726_cmolc.kg",
+            "oc_usda.c729_w.pct",
+            "ph.cacl2_usda.a481_index",
+            "ph.h2o_usda.a268_index",
+            "s.tot_usda.a624_w.pct",
+            "sand.tot_usda.c60_w.pct",
+            "silt.tot_usda.c62_w.pct"
+          ]
+        },
+        "mir": {
+          "url": "https://storage.googleapis.com/soilspec4gg-public/datasets/NEON/ossl_mir_v1.3.parquet",
+          "scan_min": 600.0,
+          "scan_max": 4000.0,
+          "scan_count": 1701,
+          "meta_columns": [
+            "id.scan.lab_src_txt"
+          ]
+        }
+      }
+    },
+    "SRB": {
+      "spectra_types": [
+        "mir"
+      ],
+      "files": {
+        "soilsite": {
+          "url": "https://storage.googleapis.com/soilspec4gg-public/datasets/SRB/ossl_soilsite_v1.3.parquet",
+          "columns": [
+            "dataset.code_ascii_txt",
+            "id.layer_local_c",
+            "id.layer_uuid_txt",
+            "latitude.point_wgs84_dd",
+            "layer.lower.depth_usda_cm",
+            "layer.upper.depth_usda_cm",
+            "longitude.point_wgs84_dd",
+            "pedon.taxa_src_txt",
+            "site.location.use_src_txt"
+          ]
+        },
+        "soillab": {
+          "url": "https://storage.googleapis.com/soilspec4gg-public/datasets/SRB/ossl_soillab_v1.3.parquet",
+          "columns": [
+            "c.tot_usda.a622_w.pct",
+            "caco3_usda.a54_w.pct",
+            "clay.tot_usda.a334_w.pct",
+            "id.layer_local_c",
+            "n.tot_usda.a623_w.pct",
+            "oc_usda.c729_w.pct",
+            "ph.h2o_usda.a268_index",
+            "sand.tot_usda.c60_w.pct",
+            "silt.tot_usda.c62_w.pct"
+          ]
+        },
+        "mir": {
+          "url": "https://storage.googleapis.com/soilspec4gg-public/datasets/SRB/ossl_mir_v1.3.parquet",
+          "scan_min": 600.0,
+          "scan_max": 4000.0,
+          "scan_count": 1701,
           "meta_columns": []
         }
       }
