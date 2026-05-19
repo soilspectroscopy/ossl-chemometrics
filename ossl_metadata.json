@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-17T03:44:50+00:00",
+  "generated_at": "2026-05-19T12:32:33+00:00",
   "datasets": {
     "AFSIS1": {
       "spectra_types": [
@@ -709,7 +709,7 @@
             "layer.lower.depth_usda_cm",
             "layer.upper.depth_usda_cm",
             "observation.date_src_yyyy.mm.dd",
-            "pedon.horizon_src_tst",
+            "pedon.horizon_src_txt",
             "site.domain_src_txt",
             "site.id_src_txt",
             "site.pit.name_src_txt",
@@ -749,6 +749,81 @@
           "scan_count": 1701,
           "meta_columns": [
             "id.scan.lab_src_txt"
+          ]
+        }
+      }
+    },
+    "PF_NZL": {
+      "spectra_types": [
+        "mir"
+      ],
+      "files": {
+        "soilsite": {
+          "url": "https://storage.googleapis.com/soilspec4gg-public/datasets/PF_NZL/ossl_soilsite_v1.3.parquet",
+          "columns": [
+            "dataset.code_ascii_txt",
+            "id.layer_local_c",
+            "id.layer_uuid_txt",
+            "id.period_src_txt",
+            "id.sample_local_c",
+            "id.site.name_src_txt",
+            "id.site_src_txt",
+            "id.treatment_src_txt",
+            "id.trial_src_txt",
+            "latitude.point_wgs84_dd",
+            "layer.lower.depth_usda_cm",
+            "layer.texture_usda_txt",
+            "layer.upper.depth_usda_cm",
+            "longitude.point_wgs84_dd",
+            "observation.date_src_yyyy.mm.dd",
+            "site.altitude_src_m",
+            "site.aspect_src_deg",
+            "site.physiography_src_txt",
+            "site.slope.shape_src_txt",
+            "site.slope_src_deg",
+            "site.species_src_txt"
+          ]
+        },
+        "soillab": {
+          "url": "https://storage.googleapis.com/soilspec4gg-public/datasets/PF_NZL/ossl_soillab_v1.3.parquet",
+          "columns": [
+            "al.ext_usda.a1056_mg.kg",
+            "b.ext_mel3_mg.kg",
+            "bd_usda.a4_g.cm3",
+            "c.tot_usda.a622_w.pct",
+            "ca.ext_usda.a1059_mg.kg",
+            "ca.ext_usda.a722_cmolc.kg",
+            "cec_usda.a723_cmolc.kg",
+            "clay.tot_usda.a334_w.pct",
+            "cu.ext_usda.a1063_mg.kg",
+            "fe.ext_usda.a1064_mg.kg",
+            "id.layer_local_c",
+            "k.ext_usda.a1065_mg.kg",
+            "k.ext_usda.a725_cmolc.kg",
+            "mg.ext_usda.a1066_mg.kg",
+            "mg.ext_usda.a724_cmolc.kg",
+            "mn.ext_usda.a1067_mg.kg",
+            "n.tot_usda.a623_w.pct",
+            "na.ext_usda.a1068_mg.kg",
+            "na.ext_usda.a726_cmolc.kg",
+            "p.ext_usda.a270_mg.kg",
+            "p.ext_usda.a274_mg.kg",
+            "p.ext_usda.a652_mg.kg",
+            "ph.h2o_usda.a268_index",
+            "sand.tot_usda.c60_w.pct",
+            "silt.tot_usda.c62_w.pct",
+            "wr.10kPa_usda.a414_w.pct",
+            "wr.1500kPa_usda.a417_w.pct",
+            "zn.ext_usda.a1073_mg.kg"
+          ]
+        },
+        "mir": {
+          "url": "https://storage.googleapis.com/soilspec4gg-public/datasets/PF_NZL/ossl_mir_v1.3.parquet",
+          "scan_min": 600.0,
+          "scan_max": 4000.0,
+          "scan_count": 1701,
+          "meta_columns": [
+            "id.sample_local_c"
           ]
         }
       }
